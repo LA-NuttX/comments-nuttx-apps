@@ -38,9 +38,13 @@ endif
 #   It is used only for cleaning.
 
 BUILDIRS   := $(dir $(wildcard $(APPDIR)$(DELIM)*$(DELIM)Make.defs))
+# dir 取含有Make.defs的目录
 BUILDIRS   := $(filter-out $(APPDIR)$(DELIM)import$(DELIM),$(BUILDIRS))
+# filter-out 去掉某种模式的字符串，此处去掉了apps/import/目录
 CONFIGDIRS := $(filter-out $(APPDIR)$(DELIM)builtin$(DELIM),$(BUILDIRS))
+# filter-out 去掉某种模式的字符串，此处去掉了apps/import/，apps/builtin/目录
 CONFIGDIRS := $(filter-out $(dir $(wildcard $(APPDIR)$(DELIM)*$(DELIM)Kconfig)),$(CONFIGDIRS))
+# 最终，去掉了含有Kconfig的目录，apps/import/，apps/builtin/目录
 CLEANDIRS  := $(dir $(wildcard $(APPDIR)$(DELIM)*$(DELIM)Makefile))
 
 # CONFIGURED_APPS is the application directories that should be built in

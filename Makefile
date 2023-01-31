@@ -147,8 +147,12 @@ context:
 	$(Q) $(MAKE) register_all
 
 Kconfig:
+#	$(warning make Kconfig in apps Makefile )
 	$(foreach SDIR, $(CONFIGDIRS), $(call MAKE_template,$(SDIR),preconfig))
+# 进入含有Make.defs的目录，除去含有Kconfig的目录，apps/import/，apps/builtin/目录，各个目录下包含了Directory.mk
 	$(Q) $(MKKCONFIG)
+# tools/mkkconfig.sh 创建apps/Kconfig
+
 
 preconfig: Kconfig
 
