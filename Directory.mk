@@ -23,39 +23,51 @@ include $(APPDIR)/Make.defs
 # Sub-directories that have been built or configured.
 
 SUBDIRS       := $(dir $(wildcard */Makefile))
+# 含有makefile的目录
 CONFIGSUBDIRS := $(filter-out $(dir $(wildcard */Kconfig)),$(SUBDIRS))
+# 含有makefile，但不含有Kconfig的目录
+#$(warning CONFIGSUBDIRS=$(CONFIGSUBDIRS))
 CLEANSUBDIRS  += $(dir $(wildcard */.depend))
 CLEANSUBDIRS  += $(dir $(wildcard */.kconfig))
 CLEANSUBDIRS  := $(sort $(CLEANSUBDIRS))
+#$(warning CLEANSUBDIRS=$(CLEANSUBDIRS))
+# 所有含有.depend,.kconfig的目录需要清理
 ifeq ($(CONFIG_WINDOWS_NATIVE),y)
 	CONFIGSUBDIRS  := $(subst /,\,$(CONFIGSUBDIRS))
 	CLEANSUBDIRS  := $(subst /,\,$(CLEANSUBDIRS))
 endif
+
 
 all: nothing
 
 .PHONY: nothing clean distclean
 
 $(foreach SDIR, $(CONFIGSUBDIRS), $(eval $(call SDIR_template,$(SDIR),preconfig)))
+# 对每个SDIR，执行make -c ${SDIR} ${SDIR}_preconfig
 $(foreach SDIR, $(CLEANSUBDIRS), $(eval $(call SDIR_template,$(SDIR),clean)))
 $(foreach SDIR, $(CLEANSUBDIRS), $(eval $(call SDIR_template,$(SDIR),distclean)))
 
 nothing:
 
 install:
-
+# 此处是递归的写法，会进一步对满足条件的子目录进行preconfig
 preconfig: $(foreach SDIR, $(CONFIGSUBDIRS), $(SDIR)_preconfig)
+#	$(warning CONFIGSUBDIRS=$(CONFIGSUBDIRS))
 ifneq ($(MENUDESC),)
 	$(Q) $(MKKCONFIG) -m $(MENUDESC)
+# tools/mkkconfig.sh -m $(MENUDESC)，例如生成audioutils下的Kconfig文件
 	$(Q) touch .kconfig
+# 例如创建audioutils/.kconfig
 endif
 
 clean: $(foreach SDIR, $(CLEANSUBDIRS), $(SDIR)_clean)
 
 distclean: $(foreach SDIR, $(CLEANSUBDIRS), $(SDIR)_distclean)
+	$(warning CLEANSUBDIRS=$(CLEANSUBDIRS))
 ifneq ($(MENUDESC),)
 	$(call DELFILE, Kconfig)
 	$(call DELFILE, .kconfig)
 endif
 
 -include Make.dep
+# -忽略退出状态，通常非0退出状态会停止当前build

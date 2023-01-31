@@ -55,7 +55,7 @@ if [ -f ${KCONFIG} ]; then
 fi
 
 echo mkkconfig in $PWD
-
+# 例如mkkconfig in /home/lqt/projects/nuttxprojects/comments/apps/audioutils
 KCONFIG_LIST=`ls -1 $PWD/*/Kconfig`
 
 echo "#" > ${KCONFIG}
